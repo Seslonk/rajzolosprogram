@@ -29,6 +29,7 @@ namespace rajzoloprogram
             Console.WriteLine("----------------");
             Console.WriteLine("X: Kilepes      ");
             Console.WriteLine("Spc: Rajz/Radir ");
+            Console.WriteLine("C: Karakter vált");
             Console.WriteLine("F1: Mind torol  ");
             Console.WriteLine("----------------");
 
@@ -36,6 +37,7 @@ namespace rajzoloprogram
             {
                 Console.SetCursorPosition(0, 7);
                 Console.WriteLine($"X: {kurzorX,-2} Y: {kurzorY,-2}    ");
+                Console.WriteLine($"Karakter: [{aktivKarakter}]      ");
 
                 for (int y = 0; y < 22; y++)
                 {
@@ -83,10 +85,24 @@ namespace rajzoloprogram
                     if (kurzorX >= 0 && kurzorX < 56 && kurzorY >= 0 && kurzorY < 22)
                     {
                         if (rajzlap[kurzorX, kurzorY] != ' ')
+                        {
                             rajzlap[kurzorX, kurzorY] = ' ';
+                        }
                         else
+                        {
                             rajzlap[kurzorX, kurzorY] = aktivKarakter;
+                        }
                     }
+                }
+                else if (gomb.Key == ConsoleKey.C)
+                {
+                    Console.SetCursorPosition(0, 15);
+                    Console.Write("Uj karakter: ");
+                    var ujBetu = Console.ReadKey();
+                    aktivKarakter = ujBetu.KeyChar;
+
+                    Console.SetCursorPosition(0, 15);
+                    Console.Write("             ");
                 }
                 else if (gomb.Key == ConsoleKey.F1)
                 {
