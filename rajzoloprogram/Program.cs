@@ -11,6 +11,7 @@ namespace rajzoloprogram
             bool fut = true;
             int kurzorX = 10;
             int kurzorY = 5;
+            char aktivKarakter = '#';
 
             char[,] rajzlap = new char[56, 22];
             for (int y = 0; y < 22; y++)
@@ -27,6 +28,8 @@ namespace rajzoloprogram
             Console.WriteLine("RAJZOLO MENÜ ");
             Console.WriteLine("----------------");
             Console.WriteLine("X: Kilepes      ");
+            Console.WriteLine("Spc: Rajz/Radir ");
+            Console.WriteLine("F1: Mind torol  ");
             Console.WriteLine("----------------");
 
             while (fut)
@@ -74,6 +77,26 @@ namespace rajzoloprogram
                 else if (gomb.Key == ConsoleKey.RightArrow && kurzorX < 55)
                 {
                     kurzorX++;
+                }
+                else if (gomb.Key == ConsoleKey.Spacebar)
+                {
+                    if (kurzorX >= 0 && kurzorX < 56 && kurzorY >= 0 && kurzorY < 22)
+                    {
+                        if (rajzlap[kurzorX, kurzorY] != ' ')
+                            rajzlap[kurzorX, kurzorY] = ' ';
+                        else
+                            rajzlap[kurzorX, kurzorY] = aktivKarakter;
+                    }
+                }
+                else if (gomb.Key == ConsoleKey.F1)
+                {
+                    for (int y = 0; y < 22; y++)
+                    {
+                        for (int x = 0; x < 56; x++)
+                        {
+                            rajzlap[x, y] = ' ';
+                        }
+                    }
                 }
             }
         }
