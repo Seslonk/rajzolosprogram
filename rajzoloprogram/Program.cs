@@ -20,6 +20,7 @@ namespace rajzoloprogram
             char aktivKarakter = '#';
             ConsoleColor aktivSzin = ConsoleColor.White;
             bool ecsetLenn = false;
+            bool wasdMod = false;
 
             Pixel[,] rajzlap = new Pixel[56, 22];
             for (int y = 0; y < 22; y++)
@@ -33,17 +34,6 @@ namespace rajzoloprogram
 
             Console.Clear();
 
-            Console.SetCursorPosition(0, 0);
-            Console.WriteLine("RAJZOLO MENÜ ");
-            Console.WriteLine("----------------");
-            Console.WriteLine("X: Kilepes      ");
-            Console.WriteLine("Spc: Rajz/Radir ");
-            Console.WriteLine("E: Ecset Fel/Le ");
-            Console.WriteLine("C: Karakter vált");
-            Console.WriteLine("S: Szín váltás  ");
-            Console.WriteLine("F1: Mind torol  ");
-            Console.WriteLine("----------------");
-
             while (fut)
             {
                 if (ecsetLenn && kurzorX >= 0 && kurzorX < 56 && kurzorY >= 0 && kurzorY < 22)
@@ -52,9 +42,21 @@ namespace rajzoloprogram
                     rajzlap[kurzorX, kurzorY].Szin = aktivSzin;
                 }
 
+                Console.SetCursorPosition(0, 0);
                 Console.ForegroundColor = ConsoleColor.Gray;
-                Console.SetCursorPosition(0, 8);
-                Console.WriteLine("");
+                Console.WriteLine("==RAJZOLO MENÜ==");
+                Console.WriteLine("----------------");
+                Console.WriteLine("X: Kilepes      ");
+                Console.WriteLine("Spc: Rajz/Radir ");
+                Console.WriteLine("E: Ecset Fel/Le ");
+                Console.WriteLine("Q: Szin valtas  ");
+                Console.WriteLine("C: Karakter valt");
+                Console.WriteLine("F2: Iranyitas   ");
+                Console.WriteLine("F1: Mind torol  ");
+                Console.WriteLine("----------------");
+
+                Console.SetCursorPosition(0, 10);
+                Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine($"X: {kurzorX,-2} Y: {kurzorY,-2}    ");
 
                 Console.Write("Karakter: [");
@@ -63,7 +65,7 @@ namespace rajzoloprogram
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine("]   ");
 
-                Console.Write("Szín: ");
+                Console.Write("Szin: ");
                 Console.ForegroundColor = aktivSzin;
                 Console.Write($"{aktivSzin,-10}");
                 Console.ForegroundColor = ConsoleColor.Gray;
@@ -79,6 +81,20 @@ namespace rajzoloprogram
                 {
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.Write("FENN      ");
+                }
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine("          ");
+
+                Console.Write("Mod:  ");
+                if (wasdMod)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write("WASD      ");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write("NYILAK    ");
                 }
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine("          ");
@@ -111,21 +127,21 @@ namespace rajzoloprogram
                 {
                     fut = false;
                 }
-                else if (gomb.Key == ConsoleKey.UpArrow && kurzorY > 0)
+                else if ((wasdMod && gomb.Key == ConsoleKey.W) || (!wasdMod && gomb.Key == ConsoleKey.UpArrow))
                 {
-                    kurzorY--;
+                    if (kurzorY > 0) kurzorY--;
                 }
-                else if (gomb.Key == ConsoleKey.DownArrow && kurzorY < 21)
+                else if ((wasdMod && gomb.Key == ConsoleKey.S) || (!wasdMod && gomb.Key == ConsoleKey.DownArrow))
                 {
-                    kurzorY++;
+                    if (kurzorY < 21) kurzorY++;
                 }
-                else if (gomb.Key == ConsoleKey.LeftArrow && kurzorX > 0)
+                else if ((wasdMod && gomb.Key == ConsoleKey.A) || (!wasdMod && gomb.Key == ConsoleKey.LeftArrow))
                 {
-                    kurzorX--;
+                    if (kurzorX > 0) kurzorX--;
                 }
-                else if (gomb.Key == ConsoleKey.RightArrow && kurzorX < 55)
+                else if ((wasdMod && gomb.Key == ConsoleKey.D) || (!wasdMod && gomb.Key == ConsoleKey.RightArrow))
                 {
-                    kurzorX++;
+                    if (kurzorX < 55) kurzorX++;
                 }
                 else if (gomb.Key == ConsoleKey.Spacebar)
                 {
@@ -147,18 +163,7 @@ namespace rajzoloprogram
                 {
                     ecsetLenn = !ecsetLenn;
                 }
-                else if (gomb.Key == ConsoleKey.C)
-                {
-                    Console.SetCursorPosition(0, 18);
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write("Új karakter: ");
-                    var ujBetu = Console.ReadKey();
-                    aktivKarakter = ujBetu.KeyChar;
-
-                    Console.SetCursorPosition(0, 18);
-                    Console.Write("                 ");
-                }
-                else if (gomb.Key == ConsoleKey.S)
+                else if (gomb.Key == ConsoleKey.Q)
                 {
                     if (aktivSzin == ConsoleColor.White) aktivSzin = ConsoleColor.Red;
                     else if (aktivSzin == ConsoleColor.Red) aktivSzin = ConsoleColor.Green;
@@ -167,6 +172,21 @@ namespace rajzoloprogram
                     else if (aktivSzin == ConsoleColor.Yellow) aktivSzin = ConsoleColor.Cyan;
                     else if (aktivSzin == ConsoleColor.Cyan) aktivSzin = ConsoleColor.Magenta;
                     else aktivSzin = ConsoleColor.White;
+                }
+                else if (gomb.Key == ConsoleKey.C)
+                {
+                    Console.SetCursorPosition(0, 20);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("Uj karakter: ");
+                    var ujBetu = Console.ReadKey();
+                    aktivKarakter = ujBetu.KeyChar;
+
+                    Console.SetCursorPosition(0, 20);
+                    Console.Write("                 ");
+                }
+                else if (gomb.Key == ConsoleKey.F2)
+                {
+                    wasdMod = !wasdMod;
                 }
                 else if (gomb.Key == ConsoleKey.F1)
                 {
