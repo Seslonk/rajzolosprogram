@@ -1,9 +1,10 @@
 ﻿using System;
+using System.IO;
 
 namespace rajzoloprogram
 {
     // (Itt az AI segítségét használtam: csináltam egy Pixel nevű struktúrát, hogy egy helyen tudjam tárolni a karaktert meg a színét is.)
-        struct Pixel
+    struct Pixel
     {
         public char Karakter;
         public ConsoleColor Szin;
@@ -15,7 +16,7 @@ namespace rajzoloprogram
         {
             // (Itt az AI segítségét használtam: ez a try-catch arra jó, hogy ne fagyjon ki a program, ha más méretű ablakban fut.)
             try { Console.SetWindowSize(80, 25); Console.SetBufferSize(80, 25); } catch { }
-            
+
             // Változók deklarálása és inicializálása
             bool fut = true;
             int kurzorX = 10;
@@ -24,6 +25,7 @@ namespace rajzoloprogram
             ConsoleColor aktivSzin = ConsoleColor.White;
             bool ecsetLenn = false;
             bool wasdMod = false;
+            string hibaUzenet = "";
 
             // Itt hozom létre a rajzlapot, és feltöltöm üres helyekkel.
             Pixel[,] rajzlap = new Pixel[56, 22];
@@ -60,14 +62,28 @@ namespace rajzoloprogram
                 Console.WriteLine("E: Ecset Fel/Le ");
                 Console.WriteLine("Q: Szin valtas  ");
                 Console.WriteLine("C: Karakter valt");
-                Console.WriteLine("F2: Iranyitas   ");
-                Console.WriteLine("F1: Mind torol  ");
+                Console.WriteLine("y: Iranyitas    ");
+                Console.WriteLine("Bksp: Mind torol");
+                Console.WriteLine("r: Fajl betolt  ");
+                Console.WriteLine("f: Kozepre ugr  ");
+                Console.WriteLine("F1-F12: Nyomdak ");
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("----------------");
                 Console.ForegroundColor = ConsoleColor.Gray;
 
-                // Itt írom ki a bal oldalra az aktuális X és Y koordinátákat.
-                Console.SetCursorPosition(0, 10);
+                // Hibajelzés / üzenet sora 
+                Console.SetCursorPosition(0, 15);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("                    ");
+                Console.SetCursorPosition(0, 15);
+                if (!string.IsNullOrEmpty(hibaUzenet))
+                {
+                    Console.WriteLine(hibaUzenet);
+                    hibaUzenet = "";
+                }
+
+                // Itt írom ki a koordinátákat és az állapotokat
+                Console.SetCursorPosition(0, 17);
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine($"X: {kurzorX,-2} Y: {kurzorY,-2}    ");
 
@@ -75,38 +91,40 @@ namespace rajzoloprogram
                 Console.ForegroundColor = aktivSzin;
                 Console.Write(aktivKarakter);
                 Console.ForegroundColor = ConsoleColor.Gray;
-                Console.WriteLine("]");
+                Console.WriteLine("]   ");
 
                 Console.Write("Szin: ");
                 Console.ForegroundColor = aktivSzin;
                 Console.Write($"{aktivSzin,-10}");
                 Console.ForegroundColor = ConsoleColor.Gray;
-                Console.WriteLine("");
+                Console.WriteLine("   ");
 
+                // Ecset sor
                 Console.Write("Ecset: ");
                 if (ecsetLenn)
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.Write("LENN");
+                    Console.Write("LENN  ");
                 }
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.Write("FENN");
+                    Console.Write("FENN  ");
                 }
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine("");
 
+                // Mód sor
                 Console.Write("Mod: ");
                 if (wasdMod)
                 {
                     Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    Console.Write("WASD");
+                    Console.Write("WASD    ");
                 }
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.Write("NYILAK");
+                    Console.Write("NYILAK  ");
                 }
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine("");
@@ -143,22 +161,22 @@ namespace rajzoloprogram
                 {
                     fut = false;
                 }
-                // Itt figyelem a mozgást: ha F2-vel átváltotta WASD-re, akkor azzal mozog, különben a nyilakkal.
+                // Kurzor mozgás határellenőrzéssel és Beep-pel
                 else if ((wasdMod && gomb.Key == ConsoleKey.W) || (!wasdMod && gomb.Key == ConsoleKey.UpArrow))
                 {
-                    if (kurzorY > 0) kurzorY--;
+                    if (kurzorY > 0) kurzorY--; else { Console.Beep(); hibaUzenet = "Határ!"; }
                 }
                 else if ((wasdMod && gomb.Key == ConsoleKey.S) || (!wasdMod && gomb.Key == ConsoleKey.DownArrow))
                 {
-                    if (kurzorY < 21) kurzorY++;
+                    if (kurzorY < 21) kurzorY++; else { Console.Beep(); hibaUzenet = "Határ!"; }
                 }
                 else if ((wasdMod && gomb.Key == ConsoleKey.A) || (!wasdMod && gomb.Key == ConsoleKey.LeftArrow))
                 {
-                    if (kurzorX > 0) kurzorX--;
+                    if (kurzorX > 0) kurzorX--; else { Console.Beep(); hibaUzenet = "Határ!"; }
                 }
                 else if ((wasdMod && gomb.Key == ConsoleKey.D) || (!wasdMod && gomb.Key == ConsoleKey.RightArrow))
                 {
-                    if (kurzorX < 55) kurzorX++;
+                    if (kurzorX < 55) kurzorX++; else { Console.Beep(); hibaUzenet = "Határ!"; }
                 }
                 // Space: rajzolás vagy radírozás
                 else if (gomb.Key == ConsoleKey.Spacebar)
@@ -177,12 +195,12 @@ namespace rajzoloprogram
                         }
                     }
                 }
-                // Az E betűvel kapcsolom be vagy ki az ecsetet (ha lenn van, folyamatosan rajzol lépés közben).
+                // Az E betűvel kapcsolom be vagy ki az ecsetet
                 else if (gomb.Key == ConsoleKey.E)
                 {
                     ecsetLenn = !ecsetLenn;
                 }
-                // Q-val váltogatom a színeket sorban egymás után 
+                // Q-val váltogatom a színeket
                 else if (gomb.Key == ConsoleKey.Q)
                 {
                     if (aktivSzin == ConsoleColor.White) aktivSzin = ConsoleColor.Red;
@@ -193,25 +211,24 @@ namespace rajzoloprogram
                     else if (aktivSzin == ConsoleColor.Cyan) aktivSzin = ConsoleColor.Magenta;
                     else aktivSzin = ConsoleColor.White;
                 }
-                // C betűvel lekérem a konzolról, hogy milyen új karaktert szeretne használni a felhasználó.
+                // C betűvel új karakter beolvasása
                 else if (gomb.Key == ConsoleKey.C)
                 {
-                    Console.SetCursorPosition(0, 20);
+                    Console.SetCursorPosition(0, 24);
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.Write("Uj karakter: ");
                     var ujBetu = Console.ReadKey();
                     aktivKarakter = ujBetu.KeyChar;
-
-                    Console.SetCursorPosition(0, 20);
-                    Console.Write("");
+                    Console.SetCursorPosition(0, 24);
+                    Console.Write("               ");
                 }
-                // F2-vel váltom át az irányítást a nyilak és a WASD között.
-                else if (gomb.Key == ConsoleKey.F2)
+                // 'y' gomb: Irányítás váltás (WASD / Nyilak)
+                else if (gomb.Key == ConsoleKey.Y)
                 {
                     wasdMod = !wasdMod;
                 }
-                // F1 gomb: a teljes rajzlap letörlése (üresre állítása
-                else if (gomb.Key == ConsoleKey.F1)
+                // Backspace gomb: a teljes rajzlap letörlése
+                else if (gomb.Key == ConsoleKey.Backspace)
                 {
                     for (int y = 0; y < 22; y++)
                     {
@@ -222,6 +239,13 @@ namespace rajzoloprogram
                         }
                     }
                 }
+                // 'f' gomb: Ugrás a rajzlap közepére
+                else if (gomb.Key == ConsoleKey.F)
+                {
+                    kurzorX = 28;
+                    kurzorY = 11;
+                }
+                
             }
         }
     }
