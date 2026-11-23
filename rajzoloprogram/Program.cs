@@ -58,8 +58,8 @@ namespace rajzoloprogram
                 Console.WriteLine("----------------");
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine("X: Kilepes      ");
-                Console.WriteLine("Spc: Rajz/Radir ");
-                Console.WriteLine("E: Ecset Fel/Le ");
+                Console.WriteLine("E: Rajz/Radir ");
+                Console.WriteLine("Spc: Ecset Fel/Le ");
                 Console.WriteLine("Q: Szin valtas  ");
                 Console.WriteLine("C: Karakter valt");
                 Console.WriteLine("y: Iranyitas    ");
@@ -71,7 +71,7 @@ namespace rajzoloprogram
                 Console.WriteLine("----------------");
                 Console.ForegroundColor = ConsoleColor.Gray;
 
-                // Hibajelzés / üzenet sora 
+                // Hibajelzés / üzenet sora
                 Console.SetCursorPosition(0, 15);
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("                    ");
@@ -178,8 +178,8 @@ namespace rajzoloprogram
                 {
                     if (kurzorX < 55) kurzorX++; else { Console.Beep(); hibaUzenet = "Határ!"; }
                 }
-                // Space: rajzolás vagy radírozás
-                else if (gomb.Key == ConsoleKey.Spacebar)
+                // E: rajzolás vagy radírozás
+                else if (gomb.Key == ConsoleKey.E)
                 {
                     if (kurzorX >= 0 && kurzorX < 56 && kurzorY >= 0 && kurzorY < 22)
                     {
@@ -195,8 +195,8 @@ namespace rajzoloprogram
                         }
                     }
                 }
-                // Az E betűvel kapcsolom be vagy ki az ecsetet
-                else if (gomb.Key == ConsoleKey.E)
+                // A Space-el kapcsolom be vagy ki az ecsetet
+                else if (gomb.Key == ConsoleKey.Spacebar)
                 {
                     ecsetLenn = !ecsetLenn;
                 }
@@ -214,13 +214,24 @@ namespace rajzoloprogram
                 // C betűvel új karakter beolvasása
                 else if (gomb.Key == ConsoleKey.C)
                 {
-                    Console.SetCursorPosition(0, 24);
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write("Uj karakter: ");
-                    var ujBetu = Console.ReadKey();
-                    aktivKarakter = ujBetu.KeyChar;
-                    Console.SetCursorPosition(0, 24);
-                    Console.Write("               ");
+                    while (true)
+                    {
+                        Console.SetCursorPosition(0, 24);
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write("Uj karakter: ");
+                        var ujBetu = Console.ReadKey();
+                        if (char.IsControl(ujBetu.KeyChar))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            aktivKarakter = ujBetu.KeyChar;
+                            Console.SetCursorPosition(0, 24);
+                            Console.Write("               ");
+                            break;
+                        }
+                    }
                 }
                 // 'y' gomb: Irányítás váltás (WASD / Nyilak)
                 else if (gomb.Key == ConsoleKey.Y)
@@ -245,7 +256,98 @@ namespace rajzoloprogram
                     kurzorX = 28;
                     kurzorY = 11;
                 }
-                
+                // 'r' gomb: Szöveges minta betöltése fájlból
+                else if (gomb.Key == ConsoleKey.R)
+                {
+                    Console.SetCursorPosition(0, 24);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("Fajlnev: ");
+                    string fajlNev = Console.ReadLine();
+                    Console.SetCursorPosition(0, 24);
+                    Console.Write("                              ");
+
+                    try
+                    {
+                        if (File.Exists(fajlNev))
+                        {
+                            string[] sorok = File.ReadAllLines(fajlNev);
+                            if (sorok.Length <= 22)
+                            {
+                                bool joMeret = true;
+                                foreach (var s in sorok) { if (s.Length > 56) joMeret = false; }
+
+                                if (joMeret)
+                                {
+                                    for (int y = 0; y < 22; y++)
+                                    {
+                                        for (int x = 0; x < 56; x++)
+                                        {
+                                            rajzlap[x, y].Karakter = ' ';
+                                            rajzlap[x, y].Szin = ConsoleColor.White;
+                                        }
+                                    }
+                                    for (int y = 0; y < sorok.Length; y++)
+                                    {
+                                        for (int x = 0; x < sorok[y].Length; x++)
+                                        {
+                                            rajzlap[x, y].Karakter = sorok[y][x];
+                                            rajzlap[x, y].Szin = aktivSzin;
+                                        }
+                                    }
+                                }
+                                else { Console.Beep(); hibaUzenet = "Túl széles fájl!"; }
+                            }
+                            else { Console.Beep(); hibaUzenet = "Túl magas fájl!"; }
+                        }
+                        else { Console.Beep(); hibaUzenet = "Nem létezik!"; }
+                    }
+                    catch
+                    {
+                        Console.Beep();
+                        hibaUzenet = "Hiba!";
+                    }
+                }
+                // F1-F12: Nyomdák (a 2. programból átemelve)
+                else if ((int)gomb.Key >= (int)ConsoleKey.F1 && (int)gomb.Key <= (int)ConsoleKey.F12)
+                {
+                    int nyomda = (int)gomb.Key - (int)ConsoleKey.F1;
+                    Nyomtat(rajzlap, kurzorX, kurzorY, nyomda, aktivKarakter, aktivSzin, ref hibaUzenet);
+                }
+            }
+        }
+
+        static void Nyomtat(Pixel[,] rajzlap, int kurzorX, int kurzorY, int nyomda, char karakter, ConsoleColor szin, ref string hibaUzenet)
+        {
+            int meret = nyomda % 3 + 1;
+            int sugar = meret;
+
+            if (kurzorX - sugar < 0 || kurzorX + sugar >= 56 || kurzorY - sugar < 0 || kurzorY + sugar >= 22)
+            {
+                Console.Beep();
+                hibaUzenet = "Kilóg!";
+                return;
+            }
+
+            void Rajzol(int x, int y)
+            {
+                rajzlap[x, y].Karakter = karakter;
+                rajzlap[x, y].Szin = szin;
+            }
+
+            for (int dx = -sugar; dx <= sugar; dx++)
+            {
+                for (int dy = -sugar; dy <= sugar; dy++)
+                {
+                    bool nyomtat = nyomda < 3 && (dx == dy || dx == -dy)
+                        || nyomda >= 3 && nyomda < 6 && (dx == 0 || dy == 0)
+                        || nyomda >= 6 && nyomda < 9 && (Math.Abs(dx) == sugar || Math.Abs(dy) == sugar)
+                        || nyomda >= 9 && Math.Abs(dx) + Math.Abs(dy) == sugar;
+
+                    if (nyomtat)
+                    {
+                        Rajzol(kurzorX + dx, kurzorY + dy);
+                    }
+                }
             }
         }
     }
