@@ -19,4 +19,4 @@
 
 ## AI-használat
 - **Csiha Milán Martin:** Kértem AI-segítséget a `Pixel` struct összerakásához, hogy egy helyen legyen a karakter és a szín, meg a `Console.SetWindowSize` és `SetBufferSize` körüli `try-catch`-hez, hogy ne szálljon el más ablakmérettel. Így már értem, hogyan működik a `Pixel[,]` tömb, és miért kell `try-catch` az ablakméret állításánál. Valamint a projektnapló megírásánál is kértem az AI segítségét, a helyesírást is ellenőríztettem vele.
-- **Jászhalmi Szabolcs:**
+- **Jászhalmi Szabolcs:** Miben kértem segítséget: Nyomda függvény kiépítése. Meg tanultam, hogy hogyan tudok több különböző mintát és méretet egyetlen függvénybe szervezni úgy, hogy ne kelljen mindegyikhez külön kódot írni.
