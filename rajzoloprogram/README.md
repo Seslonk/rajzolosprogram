@@ -16,8 +16,8 @@ Nyissa meg a parancssort lépjen be abba a mappába melybe a projektet lementett
 Vezérlés és billentyűparancsok:
 -
 * Nyilak / WASD (`y` gombbal váltató): Kurzor mozgatása
-* Space: Rajzolás / Radírozás (aktuális állapottól függően)
-* E: Ecset fel / le kapcsolása
+* E: Rajzolás / Radírozás (aktuális állapottól függően)
+* Spacebar: Ecset fel / le kapcsolása
 * Q: Szín váltása
 * C: Karakter váltása
 * Backspace: Teljes rajzlap törlése
